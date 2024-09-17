@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import laravel from 'laravel-vite-plugin';
+import laravel, {refreshPaths} from 'laravel-vite-plugin';
 
 export default defineConfig({
     plugins: [
@@ -7,8 +7,13 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/js/app.js',
+                'resources/css/filament/staff/theme.css'
             ],
-            refresh: true,
+            refresh: [
+                ...refreshPaths,
+                'app/Livewire/**/*.php',
+                'app/Filament/**/*.php',
+            ],
         }),
     ],
 });

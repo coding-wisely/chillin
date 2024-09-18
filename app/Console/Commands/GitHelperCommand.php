@@ -190,10 +190,10 @@ class GitHelperCommand extends Command
         $currentBranch = trim($process->getOutput());
 
         // Prefill branch name and add options
-        $branch = text('Enter the branch to push to', $currentBranch);
-        if (! $branch) {
+        $branch = $this->ask('Pushing code to', $currentBranch);
+        while (! $branch) {
             $this->error('Branch name cannot be empty.');
-            exit(1); // Abort if branch name is empty
+            $branch = $this->ask('Pushing code to', $currentBranch);
         }
 
         $this->info("Pushing code to branch: $branch");
@@ -204,6 +204,7 @@ class GitHelperCommand extends Command
             $this->info('Code pushed successfully.');
         } else {
             $this->error('Failed to push code.');
+            $this->error($process->getErrorOutput());
         }
     }
 

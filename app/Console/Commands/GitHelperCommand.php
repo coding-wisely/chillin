@@ -127,13 +127,6 @@ class GitHelperCommand extends Command
                 },
                 "Running $toolName..."
             );
-
-            if ($regexPattern) {
-                foreach ($outputFiles as $file) {
-                    shell_exec("git add $file");
-                    $this->info("Staged fixed file: $file");
-                }
-            }
         } else {
             $this->info("Skipping $toolName.");
         }
@@ -153,16 +146,20 @@ class GitHelperCommand extends Command
     protected function commitChanges(): void
     {
         $stagedFiles = shell_exec('git diff --cached --name-only');
+        $this->info("Staged files for commit: \n".$stagedFiles);
+
         if (empty(trim($stagedFiles))) {
             $this->info('No changes staged for commit.');
 
             return;
         }
+
         $commitMessage = text('Enter the commit message');
         if (! $commitMessage) {
             $this->error('Commit message cannot be empty.');
             exit(1);
         }
+
         shell_exec("git commit -m \"$commitMessage\"");
         $this->info('Changes committed.');
 

@@ -48,6 +48,7 @@ class Dashboard extends BaseDashboard implements HasActions, HasForms
             ->url(fn (): string => url('/staff/incomes/create'))
             ->icon('heroicon-o-plus-circle')
             ->iconSize('w-10 h-10');
+
     }
 
     public function createReport()

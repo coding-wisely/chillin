@@ -46,7 +46,26 @@ class GitHelperCommand extends Command
 
     protected function tellJokeAndExit(): void
     {
-        $this->info("It seems you're trying to commit air. Unfortunately, even the best compressors can't handle that!");
+        $jokes = [
+            'Trying to commit with no changes? 🤔 Even the best magicians can’t pull code out of thin air! 🧙‍♂️',
+            "No changes detected. 🚫 It looks like you’re trying to commit fresh air. 🌬️ Unfortunately, our repository doesn't support invisible code! 👻",
+            'It seems you’re trying to commit nothing. 🤷 Even Sherlock Holmes couldn’t investigate an empty commit! 🕵️‍♂️',
+            'Attempting to commit air? 🌬️ Sadly, our repository isn’t well-ventilated for that! 🚪',
+            'Commits need changes, not empty promises! 📜 Maybe the dog really did eat your code this time? 🐕',
+            "Trying to commit nothing? That's like sending an empty gift box! 🎁📦",
+            'No changes? Did you just try to send an imaginary friend to the repo? 🧙‍♂️🦄',
+            'Looks like you’re committing to commitment issues! 💍❌',
+            'Did you know? Even black holes have more substance than your commit! 🌌🕳️',
+            "Trying to commit empty-handed? That's like bringing a fork to a soup-eating contest! 🍴🍲",
+            'No code changes? Are you sure you’re not just practicing your keystrokes? 🎹⌨️',
+            "Committing nothing? ❌ That's like sending a blank postcard! ✉️📬",
+            'You’re so good, you’re committing pure potential! 🚀✨',
+            'Trying to commit zero? That’s like trying to toast invisible bread! 🍞🔍',
+            'No changes to commit? You just invented the stealth commit! 🕵️‍♀️✨',
+        ];
+
+        $randomJoke = $jokes[array_rand($jokes)];
+        $this->info($randomJoke);
         exit(1);
     }
 

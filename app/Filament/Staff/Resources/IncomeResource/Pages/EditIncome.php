@@ -26,10 +26,12 @@ class EditIncome extends EditRecord
     {
         return 'Income updated!';
     }
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['user_id'] = auth()->id();
         $data['received_at'] = now();
+
         return $data;
     }
 }

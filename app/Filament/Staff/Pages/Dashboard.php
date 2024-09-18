@@ -13,12 +13,11 @@ use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
 use Filament\Support\Colors\Color;
 
-
-class Dashboard extends BaseDashboard implements HasForms, HasActions
+class Dashboard extends BaseDashboard implements HasActions, HasForms
 {
+    use HasFiltersForm;
     use InteractsWithActions;
     use InteractsWithForms;
-    use HasFiltersForm;
 
     protected static ?string $navigationIcon = 'heroicon-o-home';
 
@@ -29,7 +28,7 @@ class Dashboard extends BaseDashboard implements HasForms, HasActions
     public function createLadyDrink()
     {
         return Action::make('LADY DRINKS')
-            ->url(fn(): string => url('/staff/ladydrinks/create'))
+            ->url(fn (): string => url('/staff/ladydrinks/create'))
             ->icon('heroicon-o-plus-circle')
             ->iconSize('w-10 h-10');
     }
@@ -37,7 +36,7 @@ class Dashboard extends BaseDashboard implements HasForms, HasActions
     public function createExpense()
     {
         return Action::make('EXPENSE')
-            ->url(fn(): string => url('/staff/expenses/create'))
+            ->url(fn (): string => url('/staff/expenses/create'))
             ->icon('heroicon-o-plus-circle')
             ->iconSize('w-10 h-10');
     }
@@ -45,8 +44,8 @@ class Dashboard extends BaseDashboard implements HasForms, HasActions
     public function createIncome()
     {
         return Action::make('INCOME')
-            ->color(fn() => Color::Sky)
-            ->url(fn(): string => url('/staff/incomes/create'))
+            ->color(fn () => Color::Sky)
+            ->url(fn (): string => url('/staff/incomes/create'))
             ->icon('heroicon-o-plus-circle')
             ->iconSize('w-10 h-10');
     }
@@ -55,7 +54,7 @@ class Dashboard extends BaseDashboard implements HasForms, HasActions
     {
         return Action::make('createReport')
             ->modalHeading('')
-            ->color(fn() => Color::Pink)
+            ->color(fn () => Color::Pink)
             ->icon('heroicon-o-presentation-chart-bar')
             ->modalContent(function () {
                 return view('livewire.staff.report', [
@@ -64,7 +63,7 @@ class Dashboard extends BaseDashboard implements HasForms, HasActions
             })
             ->modalSubmitActionLabel('Send report to Milan')
             ->iconSize('w-10 h-10')
-            ->action(fn() => dispatch_sync(new DailyReport()));
+            ->action(fn () => dispatch_sync(new DailyReport));
     }
 
     public function mount(): void

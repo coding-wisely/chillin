@@ -2,13 +2,11 @@
 
 namespace App\Livewire;
 
-use App\Models\Ladydrink;
 use App\Models\UserDayOff;
 use Carbon\Carbon;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -18,7 +16,6 @@ use Livewire\Component;
 
 class ListDaysOff extends Component implements HasForms, HasTable
 {
-
     use InteractsWithForms;
     use InteractsWithTable;
 
@@ -41,13 +38,13 @@ class ListDaysOff extends Component implements HasForms, HasTable
             ->query(UserDayOff::query()
                 ->whereBetween('day_off_date', [
                     Carbon::parse($this->date)->startOfDay()->toDateTimeString(),
-                    Carbon::parse($this->date)->endOfDay()->toDateTimeString()
+                    Carbon::parse($this->date)->endOfDay()->toDateTimeString(),
                 ]))
             ->columns([
                 TextColumn::make('user.name')
                     ->label('Staff'),
             ])
-            ->heading('Staff on day off for ' . Carbon::parse($this->date)->format('d M Y'))
+            ->heading('Staff on day off for '.Carbon::parse($this->date)->format('d M Y'))
             ->paginated(false)
             ->filters([
                 //
@@ -61,6 +58,7 @@ class ListDaysOff extends Component implements HasForms, HasTable
                 ]),
             ]);
     }
+
     public function render()
     {
 

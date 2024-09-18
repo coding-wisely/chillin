@@ -6,12 +6,10 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages;
-use Filament\Pages\Auth\EditProfile;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentView;
-use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -32,7 +30,7 @@ class AppPanelProvider extends PanelProvider
             ->login()
             ->passwordReset()
             ->brandName('ChillInn')
-            ->profile(\App\Filament\Pages\EditProfile::class,isSimple: false)
+            ->profile(\App\Filament\Pages\EditProfile::class, isSimple: false)
             ->colors([
                 'primary' => Color::Amber,
                 'gray' => Color::Slate,
@@ -61,9 +59,10 @@ class AppPanelProvider extends PanelProvider
                 Authenticate::class,
             ]);
     }
+
     public function register(): void
     {
         parent::register();
-        FilamentView::registerRenderHook('panels::body.end', fn():string => Blade::render("@vite('resources/js/app.js')"));
+        FilamentView::registerRenderHook('panels::body.end', fn (): string => Blade::render("@vite('resources/js/app.js')"));
     }
 }

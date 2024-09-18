@@ -3,20 +3,16 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\IncomeResource\Pages;
-use App\Filament\Resources\IncomeResource\RelationManagers;
 use App\Models\Income;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\HtmlString;
 
 class IncomeResource extends Resource
 {
@@ -52,7 +48,7 @@ class IncomeResource extends Resource
                 Group::make('created_at')
                     ->label('Date')
                     ->date()
-                    ->collapsible(true)
+                    ->collapsible(true),
             ])
             ->defaultGroup(Group::make('created_at')
                 ->date())
@@ -94,18 +90,18 @@ class IncomeResource extends Resource
                                     ->required(),
                             ])->columns(2),
                     ])
-                ->query(function (Builder $query, array $data) {
-                    return $query->when($data['from']??null, function ($query) use ($data) {
+                    ->query(function (Builder $query, array $data) {
+                        return $query->when($data['from'] ?? null, function ($query) use ($data) {
+                            $query->whereBetween('created_at', [
+                                Carbon::parse($data['from'])->startOfDay(),
+                                Carbon::parse($data['to'])->endOfDay(),
+                            ]);
+                        });
                         $query->whereBetween('created_at', [
                             Carbon::parse($data['from'])->startOfDay(),
                             Carbon::parse($data['to'])->endOfDay(),
                         ]);
-                    });
-                    $query->whereBetween('created_at', [
-                        Carbon::parse($data['from'])->startOfDay(),
-                        Carbon::parse($data['to'])->endOfDay(),
-                    ]);
-                }),
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

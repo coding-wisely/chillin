@@ -23,6 +23,7 @@ class IncomeFactory extends Factory
             'user_id' => User::factory(),
         ];
     }
+
     public function forUser(User $user): self
     {
         return $this->state(function () use ($user) {

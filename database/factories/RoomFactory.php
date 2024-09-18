@@ -22,4 +22,3 @@ class RoomFactory extends Factory
         ];
     }
 }
-

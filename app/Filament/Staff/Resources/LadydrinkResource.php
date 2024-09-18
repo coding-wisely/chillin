@@ -3,15 +3,12 @@
 namespace App\Filament\Staff\Resources;
 
 use App\Filament\Staff\Resources\LadydrinkResource\Pages;
-use App\Filament\Staff\Resources\LadydrinkResource\RelationManagers;
 use App\Models\Ladydrink;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class LadydrinkResource extends Resource
 {

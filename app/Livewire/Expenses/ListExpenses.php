@@ -39,7 +39,7 @@ class ListExpenses extends Component implements HasForms, HasTable
             ->query(Expense::query()
                 ->whereBetween('spent_at', [
                     Carbon::parse($this->date)->startOfDay()->toDateTimeString(),
-                    Carbon::parse($this->date)->endOfDay()->toDateTimeString()
+                    Carbon::parse($this->date)->endOfDay()->toDateTimeString(),
                 ]))
             ->columns([
                 Tables\Columns\TextColumn::make('category.title')
@@ -50,10 +50,10 @@ class ListExpenses extends Component implements HasForms, HasTable
                     ->sortable(),
                 TextColumn::make('amount')
                     ->money('THB')
-                    ->summarize(Sum::make()->money('THB')->label('Total:'))
+                    ->summarize(Sum::make()->money('THB')->label('Total:')),
 
             ])
-            ->heading('Expenses for ' . Carbon::parse($this->date)->format('d M Y'))
+            ->heading('Expenses for '.Carbon::parse($this->date)->format('d M Y'))
             ->paginated(false)
             ->filters([
                 //

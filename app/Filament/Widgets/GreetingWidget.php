@@ -8,9 +8,8 @@ use Illuminate\Foundation\Inspiring;
 class GreetingWidget extends Widget
 {
     protected static string $view = 'filament.widgets.greeting-widget';
-    protected int | string | array $columnSpan = 'full';
 
-
+    protected int|string|array $columnSpan = 'full';
 
     public string $hello;
 

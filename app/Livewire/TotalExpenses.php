@@ -3,7 +3,6 @@
 namespace App\Livewire;
 
 use App\Models\Expense;
-use App\Models\Income;
 use Carbon\Carbon;
 use Illuminate\Support\Number;
 use Livewire\Attributes\Computed;
@@ -30,7 +29,7 @@ class TotalExpenses extends Component
         $totalIncomes = Expense::query()
             ->whereBetween('spent_at', [
                 Carbon::parse($this->date)->startOfDay()->toDateTimeString(),
-                Carbon::parse($this->date)->endOfDay()->toDateTimeString()
+                Carbon::parse($this->date)->endOfDay()->toDateTimeString(),
             ])
             ->sum('amount');
 
@@ -38,7 +37,7 @@ class TotalExpenses extends Component
         $yesterdayTotalIncomes = Expense::query()
             ->whereBetween('spent_at', [
                 Carbon::parse($this->date)->subDay()->startOfDay()->toDateTimeString(),
-                Carbon::parse($this->date)->subDay()->endOfDay()->toDateTimeString()
+                Carbon::parse($this->date)->subDay()->endOfDay()->toDateTimeString(),
             ])
             ->sum('amount');
 
@@ -48,7 +47,7 @@ class TotalExpenses extends Component
         // Calculate the trend
         if ($totalIncomes == 0 && $yesterdayTotalIncomes == 0) {
             $trend = 'stale'; // No change, both days are zero
-        } else if ($totalIncomes >= $yesterdayTotalIncomes) {
+        } elseif ($totalIncomes >= $yesterdayTotalIncomes) {
             $trend = 'up';
         } else {
             $trend = 'down';
@@ -64,7 +63,7 @@ class TotalExpenses extends Component
         return view('livewire.total-expenses', [
             'totalExpense' => Number::currency($totalIncomes, 'THB'),
             'percentageDifference' => $percentageDifference,
-            'trend' => $trend
+            'trend' => $trend,
         ]);
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Filament\Staff\Resources\IncomeResource\Pages;
 
 use App\Filament\Staff\Resources\IncomeResource;
-use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateIncome extends CreateRecord
@@ -19,10 +18,12 @@ class CreateIncome extends CreateRecord
     {
         return 'Income created!';
     }
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['user_id'] = auth()->id();
         $data['received_at'] = now();
+
         return $data;
     }
 }

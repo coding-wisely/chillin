@@ -10,8 +10,8 @@ use Filament\Tables\Concerns\HasFilters;
 class ListExpenses extends ListRecords
 {
     use HasFilters;
-    protected static string $resource = ExpenseResource::class;
 
+    protected static string $resource = ExpenseResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -20,10 +20,11 @@ class ListExpenses extends ListRecords
 
         ];
     }
+
     protected function getHeaderWidgets(): array
     {
         return [
-            ExpenseResource\Widgets\ExpenseStatsWidget::class
+            ExpenseResource\Widgets\ExpenseStatsWidget::class,
         ];
     }
 }

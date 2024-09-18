@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
         Model::unguard();
         LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
             $switch
-                ->locales(['th','en']); // also accepts a closure
+                ->locales(['th', 'en']); // also accepts a closure
         });
 
     }

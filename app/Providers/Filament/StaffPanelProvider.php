@@ -57,9 +57,10 @@ class StaffPanelProvider extends PanelProvider
             ])
             ->viteTheme('resources/css/filament/staff/theme.css');
     }
+
     public function register(): void
     {
         parent::register();
-        FilamentView::registerRenderHook('panels::body.end', fn():string => Blade::render("@vite('resources/js/app.js')"));
+        FilamentView::registerRenderHook('panels::body.end', fn (): string => Blade::render("@vite('resources/js/app.js')"));
     }
 }

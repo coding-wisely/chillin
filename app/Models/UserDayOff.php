@@ -18,5 +18,4 @@ class UserDayOff extends Model
             'day_off_date' => 'date',
         ];
     }
-
 }

@@ -13,10 +13,11 @@ class ExpenseStatsWidget extends BaseWidget
         $categories = Category::all();
         $stats = [];
         foreach ($categories as $category) {
-            $category->expenses = \Number::currency($category->expenses()->sum('amount'),'THB', 'th');
+            $category->expenses = \Number::currency($category->expenses()->sum('amount'), 'THB', 'th');
 
-            $stats[] = Stat::make($category->title, $category->expenses ??0);
+            $stats[] = Stat::make($category->title, $category->expenses ?? 0);
         }
+
         return $stats;
     }
 }

@@ -13,6 +13,7 @@ class Category extends Model
     {
         return $this->hasMany(Expense::class);
     }
+
     public function incomes()
     {
         return $this->hasMany(Income::class);

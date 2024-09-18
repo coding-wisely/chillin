@@ -21,10 +21,8 @@ use Livewire\Component;
 
 class ListLadyDrinks extends Component implements HasForms, HasTable
 {
-
     use InteractsWithForms;
     use InteractsWithTable;
-
 
     public $date;
 
@@ -45,7 +43,7 @@ class ListLadyDrinks extends Component implements HasForms, HasTable
             ->query(Ladydrink::query()
                 ->whereBetween('created_at', [
                     Carbon::parse($this->date)->startOfDay()->toDateTimeString(),
-                    Carbon::parse($this->date)->endOfDay()->toDateTimeString()
+                    Carbon::parse($this->date)->endOfDay()->toDateTimeString(),
                 ]))
             ->columns([
                 TextColumn::make('user.name')
@@ -54,10 +52,10 @@ class ListLadyDrinks extends Component implements HasForms, HasTable
                     ->sortable(),
                 TextColumn::make('amount')
                     ->money('THB')
-                    ->summarize(Sum::make()->money('THB')->label('Total:'))
+                    ->summarize(Sum::make()->money('THB')->label('Total:')),
 
             ])
-            ->heading('Lady Drinks for ' . Carbon::parse($this->date)->format('d M Y'))
+            ->heading('Lady Drinks for '.Carbon::parse($this->date)->format('d M Y'))
             ->paginated(false)
             ->filters([
                 //
@@ -71,6 +69,7 @@ class ListLadyDrinks extends Component implements HasForms, HasTable
                 ]),
             ]);
     }
+
     public function render(): Application|Factory|\Illuminate\Contracts\View\View|View
     {
         return view('livewire.list-lady-drinks');

@@ -10,7 +10,6 @@ use Livewire\Component;
 
 class TotalIncomes extends Component
 {
-
     public $date;
 
     #[Computed]
@@ -29,14 +28,14 @@ class TotalIncomes extends Component
         $totalIncomes = Income::query()
             ->whereBetween('received_at', [
                 Carbon::parse($this->date)->startOfDay()->toDateTimeString(),
-                Carbon::parse($this->date)->endOfDay()->toDateTimeString()
+                Carbon::parse($this->date)->endOfDay()->toDateTimeString(),
             ])
             ->sum('amount');
 
         $yesterdayTotalIncomes = Income::query()
             ->whereBetween('received_at', [
                 Carbon::parse($this->date)->subDay()->startOfDay()->toDateTimeString(),
-                Carbon::parse($this->date)->subDay()->endOfDay()->toDateTimeString()
+                Carbon::parse($this->date)->subDay()->endOfDay()->toDateTimeString(),
             ])
             ->sum('amount');
 
@@ -45,17 +44,18 @@ class TotalIncomes extends Component
         // Calculate the trend
         if ($totalIncomes == 0 && $yesterdayTotalIncomes == 0) {
             $trend = 'stale'; // No change, both days are zero
-        } else if ($totalIncomes >= $yesterdayTotalIncomes) {
+        } elseif ($totalIncomes >= $yesterdayTotalIncomes) {
             $trend = 'up';
         } else {
             $trend = 'down';
         }
 
         $percentageDifference = $yesterdayTotalIncomes != 0 ? ($difference / $yesterdayTotalIncomes) * 100 : ($totalIncomes != 0 ? 100 : 0);
+
         return view('livewire.total-incomes', [
             'totalIncomes' => Number::currency($totalIncomes, 'THB'),
             'percentageDifference' => $percentageDifference,
-            'trend' => $trend
+            'trend' => $trend,
         ]);
     }
 }

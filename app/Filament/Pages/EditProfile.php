@@ -2,12 +2,9 @@
 
 namespace App\Filament\Pages;
 
-
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Pages\Auth\EditProfile as BaseEditProfile;
-
 
 class EditProfile extends BaseEditProfile
 {
@@ -16,7 +13,7 @@ class EditProfile extends BaseEditProfile
         return $form
             ->schema([
                 FileUpload::make('profile_photo_path')
-                ->maxSize(1024*1024*10)
+                    ->maxSize(1024 * 1024 * 10)
                     ->avatar(),
                 $this->getNameFormComponent(),
                 $this->getEmailFormComponent(),

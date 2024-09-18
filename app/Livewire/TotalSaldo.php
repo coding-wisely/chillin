@@ -41,11 +41,10 @@ class TotalSaldo extends Component
         $incomeDifference = $totalIncomes - $yesterdayTotalIncomes;
         $trend = $incomeDifference > 0 ? 'up' : 'down';
 
-
         return view('livewire.total-saldo', [
             'totalSaldo' => Number::currency($totalSaldo, 'THB'),
             'percentageDifference' => $percentageDifference,
-            'trend' => $trend
+            'trend' => $trend,
         ]);
 
     }
@@ -55,10 +54,11 @@ class TotalSaldo extends Component
         return $modelClass::query()
             ->whereBetween($dateField, [
                 $date->startOfDay()->toDateTimeString(),
-                $date->endOfDay()->toDateTimeString()
+                $date->endOfDay()->toDateTimeString(),
             ])
             ->sum('amount');
     }
+
     private function calculatePercentageDifference($currentValue, $previousValue)
     {
         if ($previousValue != 0) {

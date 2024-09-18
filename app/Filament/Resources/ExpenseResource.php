@@ -3,21 +3,14 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ExpenseResource\Pages;
-use App\Filament\Resources\ExpenseResource\RelationManagers;
 use App\Filament\Resources\ExpenseResource\Widgets\ExpenseStatsWidget;
-use App\Filament\Resources\ExpensesResource\Widgets\ExpensesResourceStatsWidget;
-use App\Models\Category;
 use App\Models\Expense;
 use Filament\Forms;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Form;
-use Filament\Pages\Dashboard\Actions\FilterAction;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;    use HasFiltersAction;
 
 class ExpenseResource extends Resource
 {
@@ -33,9 +26,9 @@ class ExpenseResource extends Resource
                     ->required(),
                 Forms\Components\Select::make('category_id')
                     ->relationship('category', 'title')
-                    ->when(fn() => auth()->user()->email === 'milan@chillinpattaya.com')
+                    ->when(fn () => auth()->user()->email === 'milan@chillinpattaya.com')
                     ->createOptionForm(
-                        [Forms\Components\TextInput::make('title')->required(),]
+                        [Forms\Components\TextInput::make('title')->required()]
                     )
                     ->required(),
                 Forms\Components\Textarea::make('description')
@@ -57,7 +50,7 @@ class ExpenseResource extends Resource
                 Group::make('created_at')
                     ->label('Date')
                     ->date()
-                    ->collapsible(true)
+                    ->collapsible(true),
             ])
             ->defaultGroup(Group::make('created_at')
                 ->date())
@@ -91,15 +84,13 @@ class ExpenseResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ])
-           ;
+            ]);
     }
-
 
     public static function getWidgets(): array
     {
         return [
-            ExpenseStatsWidget::class
+            ExpenseStatsWidget::class,
         ];
 
     }

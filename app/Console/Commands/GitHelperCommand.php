@@ -156,6 +156,7 @@ class GitHelperCommand extends Command
 
         if ($process->isSuccessful()) {
             $this->info('Code pushed successfully.');
+
             // Get the list of committed files
             $committedFiles = $this->getCommittedFiles();
 
@@ -167,6 +168,14 @@ class GitHelperCommand extends Command
             } else {
                 $this->info('No files were committed.');
             }
+
+            // Get the commit hash
+            $commitHash = trim(shell_exec('git log -1 --format="%H"'));
+            $this->info("Commit hash: $commitHash");
+
+            // Get the Git username who pushed
+            $gitUserName = trim(shell_exec('git config user.name'));
+            $this->info("Pushed by: $gitUserName");
         } else {
             $this->error('Failed to push code.');
             $this->error($process->getErrorOutput());

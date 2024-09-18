@@ -30,6 +30,7 @@ class ListDaysOff extends Component implements HasForms, HasTable
     public function mount($date): void
     {
         $this->date = $date;
+
     }
 
     public function table(Table $table): Table

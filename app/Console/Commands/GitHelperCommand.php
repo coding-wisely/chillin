@@ -16,34 +16,22 @@ class GitHelperCommand extends Command
 
     protected $description = 'Helper command for running Pint, PHPStan, PHPUnit, and managing Git operations.';
 
-    public function handle()
+    public function handle(): void
     {
-        // Step 1: Ensure Laravel Pint is installed
         $this->ensurePintInstalled();
 
-        // Step 2: Ensure PHPStan is installed
-        $this->ensurePHPStanInstalled();
+        $this->ensurePestIsInstalled();
 
-        // Step 3: Ensure PHPUnit is installed
-        $this->ensurePHPUnitInstalled();
-
-        // Step 4: Run Pint
         $this->runPint();
 
-        // Step 5: Run PHPStan
-        $this->runPHPStan();
-
-        // Step 6: Run Unit Tests
         $this->runTests();
 
-        // Step 7: Select Files to Stage
         $this->selectFilesToStage();
 
-        // Step 8: Commit and Push Changes
         $this->commitAndPush();
     }
 
-    protected function ensurePintInstalled()
+    protected function ensurePintInstalled(): void
     {
         if (! file_exists(base_path('vendor/bin/pint'))) {
             $installPint = confirm('Laravel Pint is not installed. Would you like to install it?', true);
@@ -57,21 +45,7 @@ class GitHelperCommand extends Command
         }
     }
 
-    protected function ensurePHPStanInstalled()
-    {
-        if (! file_exists(base_path('vendor/bin/phpstan'))) {
-            $installPHPStan = confirm('PHPStan is not installed. Would you like to install it?', true);
-            if ($installPHPStan) {
-                shell_exec('composer require phpstan/phpstan --dev');
-                $this->info('PHPStan installed successfully.');
-            } else {
-                $this->error('PHPStan is required. Aborting.');
-                exit(1);
-            }
-        }
-    }
-
-    protected function ensurePHPUnitInstalled()
+    protected function ensurePestIsInstalled(): void
     {
         if (! file_exists(base_path('vendor/bin/pest'))) {
             $installPHPUnit = confirm('PHP Pest is not installed. Would you like to install it?', true);
@@ -88,7 +62,7 @@ class GitHelperCommand extends Command
         }
     }
 
-    protected function runPint()
+    protected function runPint(): void
     {
         if ($this->confirm('Would you like to run Laravel Pint?', true)) {
             spin(
@@ -108,27 +82,7 @@ class GitHelperCommand extends Command
         }
     }
 
-    protected function runPHPStan()
-    {
-        if ($this->confirm('Would you like to run PHPStan?', true)) {
-            spin(
-                function () {
-                    $phpStanOutput = shell_exec('./vendor/bin/phpstan analyse');
-                    $this->info($phpStanOutput);
-                    // Check if there were errors
-                    if (str_contains($phpStanOutput, 'errors')) {
-                        $this->error('PHPStan found errors. Please fix them before proceeding.');
-                        exit(1); // Abort if there were errors
-                    }
-                },
-                'Running PHPStan...'
-            );
-        } else {
-            $this->info('Skipping PHPStan.');
-        }
-    }
-
-    protected function runTests()
+    protected function runTests(): void
     {
         if ($this->confirm('Would you like to run Pest Tests? If you need more detailed tests, please run it manually with flags you need.', true)) {
             spin(
@@ -170,7 +124,7 @@ class GitHelperCommand extends Command
         shell_exec('git add '.implode(' ', $files));
     }
 
-    protected function commitAndPush()
+    protected function commitAndPush(): void
     {
         $commitMessage = text('Enter the commit message');
         if (! $commitMessage) {
@@ -208,7 +162,7 @@ class GitHelperCommand extends Command
         }
     }
 
-    protected function getGitChanges()
+    protected function getGitChanges(): array
     {
         $output = shell_exec('git status -s');
         $lines = explode("\n", trim($output));
@@ -216,7 +170,7 @@ class GitHelperCommand extends Command
 
         foreach ($lines as $line) {
             if (! empty($line)) {
-                $changes[] = trim(substr($line, 3)); // Extract the file path
+                $changes[] = trim(substr($line, 2)); // Extract the file path
             }
         }
 

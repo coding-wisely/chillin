@@ -24,8 +24,16 @@ class GitHelperCommand extends Command
         $this->ensurePintInstalled();
         $this->ensurePestIsInstalled();
         $fixedFiles = $this->runPint();
+
+        if (! empty($fixedFiles)) {
+            foreach ($fixedFiles as $file) {
+                shell_exec("git add $file");
+                $this->info("Staged fixed file: $file");
+            }
+        }
+
         $this->runTests();
-        $this->stageFixedFiles($fixedFiles);
+        $this->stageFixedFiles();
         $this->commitChanges();
     }
 
@@ -114,12 +122,9 @@ class GitHelperCommand extends Command
         return $outputFiles;
     }
 
-    protected function stageFixedFiles(array $fixedFiles): void
+    protected function stageFixedFiles(): void
     {
-        foreach ($fixedFiles as $file) {
-            shell_exec("git add $file");
-            $this->info("Staged fixed file: $file");
-        }
+        shell_exec('git add -u');
         $stagedFiles = shell_exec('git diff --cached --name-only');
         if (empty(trim($stagedFiles))) {
             $this->info('No changes staged for commit.');

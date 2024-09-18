@@ -17,12 +17,29 @@ class GitHelperCommand extends Command
 
     public function handle(): void
     {
+        if (! $this->hasChanges()) {
+            $this->tellJokeAndExit();
+        }
+
         $this->ensurePintInstalled();
         $this->ensurePestIsInstalled();
         $fixedFiles = $this->runPint();
         $this->runTests();
         $this->stageFixedFiles($fixedFiles);
         $this->commitChanges();
+    }
+
+    protected function hasChanges(): bool
+    {
+        $changes = shell_exec('git status --porcelain');
+
+        return ! empty(trim($changes));
+    }
+
+    protected function tellJokeAndExit(): void
+    {
+        $this->info("It seems you're trying to commit air. Unfortunately, even the best compressors can't handle that!");
+        exit(1);
     }
 
     protected function ensurePintInstalled(): void

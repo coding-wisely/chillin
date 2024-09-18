@@ -23,16 +23,10 @@ class GitHelperCommand extends Command
 
         $this->ensurePintInstalled();
         $this->ensurePestIsInstalled();
-        $fixedFiles = $this->runPint();
-
-        if (! empty($fixedFiles)) {
-            foreach ($fixedFiles as $file) {
-                shell_exec("git add $file");
-                $this->info("Staged fixed file: $file");
-            }
-        }
+        $this->runPint();
 
         $this->runTests();
+
         $this->stageFixedFiles();
         $this->commitChanges();
     }
@@ -40,6 +34,7 @@ class GitHelperCommand extends Command
     protected function hasChanges(): bool
     {
         $changes = shell_exec('git status --porcelain');
+        $this->info("Initial git status changes: \n".$changes);
 
         return ! empty(trim($changes));
     }
@@ -96,9 +91,17 @@ class GitHelperCommand extends Command
         }
     }
 
-    protected function runPint(): array
+    protected function runPint(): void
     {
-        return $this->runTool('Laravel Pint', './vendor/bin/pint --dirty', '/^\s+✓ (\S+)/m');
+        $outputFiles = $this->runTool('Laravel Pint', './vendor/bin/pint --dirty', '/^\s+✓ (\S+)/m');
+        if (! empty($outputFiles)) {
+            foreach ($outputFiles as $file) {
+                $this->info("Staging fixed file: $file");
+                shell_exec("git add $file");
+                $stagedStatus = shell_exec('git status --porcelain '.escapeshellarg($file));
+                $this->info("Staging status for $file: \n".$stagedStatus);
+            }
+        }
     }
 
     protected function runTests(): void
@@ -136,8 +139,11 @@ class GitHelperCommand extends Command
 
     protected function stageFixedFiles(): void
     {
+        $this->info('Running git add -u to stage any fixed files.');
         shell_exec('git add -u');
         $stagedFiles = shell_exec('git diff --cached --name-only');
+        $this->info("Files after git add -u: \n".$stagedFiles);
+
         if (empty(trim($stagedFiles))) {
             $this->info('No changes staged for commit.');
         }

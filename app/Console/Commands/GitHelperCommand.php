@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 use Symfony\Component\Process\Process;
 
 use function Laravel\Prompts\confirm;
@@ -133,7 +134,17 @@ class GitHelperCommand extends Command
         }
 
         $this->info('Staging changes...');
-        shell_exec('git add .');
+        $modifiedFiles = $this->getModifiedFiles();
+
+        if (count($modifiedFiles) === 0) {
+            $this->info('No modified files to stage.');
+
+            return;
+        }
+
+        foreach ($modifiedFiles as $file) {
+            shell_exec("git add $file");
+        }
 
         $this->info('Committing changes...');
         shell_exec("git commit -m \"$commitMessage\"");
@@ -180,6 +191,25 @@ class GitHelperCommand extends Command
             $this->error('Failed to push code.');
             $this->error($process->getErrorOutput());
         }
+    }
+
+    protected function getModifiedFiles(): array
+    {
+        // Retrieve the list of modified files
+        $output = shell_exec('git status --porcelain');
+        $lines = explode("\n", trim($output));
+
+        $modifiedFiles = [];
+        foreach ($lines as $line) {
+            if (! empty($line)) {
+                $filePath = substr($line, 3); // Remove the status part (e.g., " M ")
+                if (File::exists(base_path($filePath))) {
+                    $modifiedFiles[] = $filePath;
+                }
+            }
+        }
+
+        return $modifiedFiles;
     }
 
     protected function getCommittedFiles(): array

@@ -17,18 +17,25 @@ class GitHelperCommand extends Command
 
     public function handle(): void
     {
+        // Ensure Pint and Pest are installed.
         $this->ensurePintInstalled();
         $this->ensurePestIsInstalled();
 
-        $fixedFiles = $this->runPint();
+        // Check for any modifications in the repository.
+        if ($this->hasModifications()) {
+            // Run Pint and Tests.
+            $fixedFiles = $this->runPint();
+            $this->runTests();
 
-        $this->runTests();
-
-        if ($this->stageFixedFiles($fixedFiles)) {
-            $this->commitChanges();
+            // Stage fixed files and commit changes.
+            if ($this->stageFixedFiles($fixedFiles)) {
+                $this->commitChanges();
+            } else {
+                $this->info('No changes staged for commit. Are you just playing around or what? 😜');
+            }
         } else {
-            // Friendly joke if there are no changes to commit
-            $this->info('No changes staged for commit. Are you just playing around or what? 😜');
+            // Friendly joke if there are no modifications at all.
+            $this->info('No changes detected in the repository. Are you just playing around or what? 😜');
         }
     }
 
@@ -63,38 +70,41 @@ class GitHelperCommand extends Command
         }
     }
 
+    protected function hasModifications(): bool
+    {
+        $output = shell_exec('git status --porcelain');
+
+        return ! empty(trim($output));
+    }
+
     protected function runPint(): array
     {
         $fixedFiles = [];
 
-        if (confirm('Would you like to run Laravel Pint?', true)) {
-            spin(
-                function () use (&$fixedFiles) {
-                    $pintOutput = shell_exec('./vendor/bin/pint');
-                    $this->info($pintOutput);
+        spin(
+            function () use (&$fixedFiles) {
+                $pintOutput = shell_exec('./vendor/bin/pint');
+                $this->info($pintOutput);
 
-                    // Collect the list of fixed files from the output
-                    preg_match_all('/^\s+✓ (\S+)/m', $pintOutput, $matches);
-                    if (isset($matches[1])) {
-                        $fixedFiles = $matches[1];
-                    }
+                // Collect the list of fixed files from the output
+                preg_match_all('/^\s+✓ (\S+)/m', $pintOutput, $matches);
+                if (isset($matches[1])) {
+                    $fixedFiles = $matches[1];
+                }
 
-                    // Check if there were errors
-                    if (str_contains($pintOutput, 'FAIL') || str_contains($pintOutput, 'ERROR')) {
-                        $this->error('Laravel Pint found errors. Please fix them before proceeding.');
-                        exit(1); // Abort if there were errors
-                    }
-                },
-                'Running Laravel Pint...'
-            );
+                // Check if there were errors
+                if (str_contains($pintOutput, 'FAIL') || str_contains($pintOutput, 'ERROR')) {
+                    $this->error('Laravel Pint found errors. Please fix them before proceeding.');
+                    exit(1); // Abort if there were errors
+                }
+            },
+            'Running Laravel Pint...'
+        );
 
-            // Ensure we stage any fixed files right after Pint runs
-            foreach ($fixedFiles as $file) {
-                shell_exec("git add $file");
-                $this->info("Staged fixed file: $file");
-            }
-        } else {
-            $this->info('Skipping Laravel Pint.');
+        // Ensure we stage any fixed files right after Pint runs.
+        foreach ($fixedFiles as $file) {
+            shell_exec("git add $file");
+            $this->info("Staged fixed file: $file");
         }
 
         return $fixedFiles;
@@ -108,10 +118,10 @@ class GitHelperCommand extends Command
                     $testOutput = shell_exec('./vendor/bin/pest');
                     $this->info($testOutput);
 
-                    // Check if there were errors
+                    // Check if there were errors.
                     if (str_contains($testOutput, 'Fail') || str_contains($testOutput, 'Error')) {
                         $this->error('Your Pest tests failed. Please fix them before proceeding.');
-                        exit(1); // Abort if there were errors
+                        exit(1); // Abort if there were errors.
                     }
                 },
                 'Running Pest Tests...'
@@ -123,19 +133,16 @@ class GitHelperCommand extends Command
 
     protected function stageFixedFiles(array $fixedFiles): bool
     {
-        // Stage the fixed files
+        // Stage the fixed files.
         foreach ($fixedFiles as $file) {
             shell_exec("git add $file");
             $this->info("Staged fixed file: $file");
         }
 
-        // Check if there are any staged files
+        // Check if there are any staged files.
         $stagedFiles = shell_exec('git diff --cached --name-only');
-        if (empty(trim($stagedFiles))) {
-            return false;
-        }
 
-        return true;
+        return ! empty(trim($stagedFiles));
     }
 
     protected function commitChanges(): void
@@ -143,26 +150,26 @@ class GitHelperCommand extends Command
         $commitMessage = text('Enter the commit message');
         if (! $commitMessage) {
             $this->error('Commit message cannot be empty.');
-            exit(1); // Abort if commit message is empty
+            exit(1); // Abort if commit message is empty.
         }
 
-        // Commit the staged files
+        // Commit the staged files.
         shell_exec("git commit -m \"$commitMessage\"");
         $this->info('Changes committed.');
 
-        // Get the current branch name
+        // Get the current branch name.
         $process = new Process(['git', 'rev-parse', '--abbrev-ref', 'HEAD']);
         $process->run();
         $currentBranch = trim($process->getOutput());
 
-        // Prefill branch name and add options
+        // Prefill branch name and add options.
         $branch = $this->ask('Pushing code to', $currentBranch);
         while (! $branch) {
             $this->error('Branch name cannot be empty.');
             $branch = $this->ask('Pushing code to', $currentBranch);
         }
 
-        // Push the changes
+        // Push the changes.
         $process = new Process(['git', 'push', 'origin', $branch]);
         $process->run();
         $this->info($process->getOutput());
@@ -172,11 +179,11 @@ class GitHelperCommand extends Command
             $this->error('Failed to push code.');
         }
 
-        // Get the commit hash
+        // Get the commit hash.
         $commitHash = shell_exec('git log -1 --format="%H"');
         $commitHash = trim($commitHash);
 
-        // Get the Git username who pushed
+        // Get the Git username who pushed.
         $gitUserName = shell_exec('git config user.name');
         $gitUserName = trim($gitUserName);
 

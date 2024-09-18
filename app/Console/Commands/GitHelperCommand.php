@@ -94,13 +94,19 @@ class GitHelperCommand extends Command
     protected function runPint(): void
     {
         $outputFiles = $this->runTool('Laravel Pint', './vendor/bin/pint --dirty', '/^\s+✓ (\S+)/m');
-        if (! empty($outputFiles)) {
-            foreach ($outputFiles as $file) {
-                $this->info("Staging fixed file: $file");
-                shell_exec("git add $file");
-                $stagedStatus = shell_exec('git status --porcelain '.escapeshellarg($file));
-                $this->info("Staging status for $file: \n".$stagedStatus);
+
+        foreach ($outputFiles as $file) {
+            // Check file permissions
+            if (! is_writable($file)) {
+                $this->warn("File $file is not writable.");
+
+                continue;
             }
+
+            // Stage the file
+            shell_exec('git add '.escapeshellarg($file));
+            $stagedStatus = shell_exec('git status --porcelain '.escapeshellarg($file));
+            $this->info("Staging status for $file: \n".$stagedStatus);
         }
     }
 
@@ -141,7 +147,7 @@ class GitHelperCommand extends Command
     {
         $this->info('Running git add -u to stage any fixed files.');
         shell_exec('git add -u');
-        $stagedFiles = shell_exec('git diff --cached --name-only');
+        $stagedFiles = shell_exec('git status --porcelain --untracked-files=no');
         $this->info("Files after git add -u: \n".$stagedFiles);
 
         if (empty(trim($stagedFiles))) {
@@ -151,7 +157,7 @@ class GitHelperCommand extends Command
 
     protected function commitChanges(): void
     {
-        $stagedFiles = shell_exec('git diff --cached --name-only');
+        $stagedFiles = shell_exec('git status --porcelain --untracked-files=no');
         $this->info("Staged files for commit: \n".$stagedFiles);
 
         if (empty(trim($stagedFiles))) {
@@ -166,7 +172,7 @@ class GitHelperCommand extends Command
             exit(1);
         }
 
-        shell_exec("git commit -m \"$commitMessage\"");
+        shell_exec('git commit -m '.escapeshellarg($commitMessage));
         $this->info('Changes committed.');
 
         $currentBranch = $this->getCurrentBranch();

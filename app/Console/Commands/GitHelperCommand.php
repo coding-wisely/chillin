@@ -140,7 +140,7 @@ class GitHelperCommand extends Command
             $this->info("Skipping $toolName.");
         }
 
-return $outputFiles;
+        return $outputFiles;
     }
 
     protected function stageFixedFiles(): void

@@ -20,7 +20,7 @@ class ListDaysOff extends Component implements HasForms, HasTable
     use InteractsWithTable;
 
     public $date;
-this
+
     #[Computed]
     public function getDate(): string
     {

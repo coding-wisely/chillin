@@ -162,12 +162,14 @@ class GitHelperCommand extends Command
         $process->run();
         $currentBranch = trim($process->getOutput());
 
-        // Prefill branch name and add options.
+        // Brief message before pushing the changes.
         $branch = $this->ask('Pushing code to', $currentBranch);
         while (! $branch) {
             $this->error('Branch name cannot be empty.');
             $branch = $this->ask('Pushing code to', $currentBranch);
         }
+
+        $this->info('Pushing...');
 
         // Push the changes.
         $process = new Process(['git', 'push', 'origin', $branch]);

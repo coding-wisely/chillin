@@ -1,74 +1,186 @@
 <?php
 
-namespace App\Filament\Staff\Pages;
+namespace App\Console\Commands;
 
-use App\Notifications\DailyReport;
-use Carbon\Carbon;
-use Filament\Actions\Action;
-use Filament\Actions\Concerns\InteractsWithActions;
-use Filament\Actions\Contracts\HasActions;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Pages\Dashboard as BaseDashboard;
-use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
-use Filament\Support\Colors\Color;
+use Illuminate\Console\Command;
+use Symfony\Component\Process\Process;
 
-class Dashboard extends BaseDashboard implements HasActions, HasForms
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\spin;
+use function Laravel\Prompts\text;
+
+class GitHelperCommand extends Command
 {
-    use HasFiltersForm;
-    use InteractsWithActions;
-    use InteractsWithForms;
+    protected $signature = 'git:helper';
 
-    protected static ?string $navigationIcon = 'heroicon-o-home';
+    protected $description = 'Helper command for running Pint, PHPStan, PHPUnit, and managing Git operations.';
 
-    protected static string $view = 'filament.staff.pages.dashboard';
-
-    public string $date = '';
-
-    public function createLadyDrink()
+    public function handle(): void
     {
-        return Action::make('LADY DRINKS')
-            ->url(fn (): string => url('/staff/ladydrinks/create'))
-            ->icon('heroicon-o-plus-circle')
-            ->iconSize('w-10 h-10');
+        $this->ensurePintInstalled();
+        $this->ensurePestIsInstalled();
+
+        $fixedFiles = $this->runPint();
+
+        $this->runTests();
+
+        if ($this->stageFixedFiles($fixedFiles)) {
+            $this->commitChanges();
+        } else {
+            // Friendly joke if there are no changes to commit
+            $this->info('No changes staged for commit. Are you just playing around or what? 😜');
+        }
     }
 
-    public function createExpense()
+    protected function ensurePintInstalled(): void
     {
-        return Action::make('EXPENSE')
-            ->url(fn (): string => url('/staff/expenses/create'))
-            ->icon('heroicon-o-plus-circle')
-            ->iconSize('w-10 h-10');
+        if (! file_exists(base_path('vendor/bin/pint'))) {
+            $installPint = confirm('Laravel Pint is not installed. Would you like to install it?', true);
+            if ($installPint) {
+                shell_exec('composer require laravel/pint --dev');
+                $this->info('Laravel Pint installed successfully.');
+            } else {
+                $this->error('Laravel Pint is required. Aborting.');
+                exit(1);
+            }
+        }
     }
 
-    public function createIncome()
+    protected function ensurePestIsInstalled(): void
     {
-        return Action::make('INCOME')
-            ->color(fn () => Color::Sky)
-            ->url(fn (): string => url('/staff/incomes/create'))
-            ->icon('heroicon-o-plus-circle')
-            ->iconSize('w-10 h-10');
-
+        if (! file_exists(base_path('vendor/bin/pest'))) {
+            $installPHPUnit = confirm('PHP Pest is not installed. Would you like to install it?', true);
+            if ($installPHPUnit) {
+                $this->info('Removing PHP Unit...');
+                shell_exec('composer remove phpunit/phpunit');
+                $this->info('Adding PHP Pest with all dependencies...');
+                shell_exec('composer require pestphp/pest --dev --with-all-dependencies');
+                $this->info('PHP Pest installed successfully.');
+            } else {
+                $this->error('PHP Pest is required. Aborting.');
+                exit(1);
+            }
+        }
     }
 
-    public function createReport()
+    protected function runPint(): array
     {
-        return Action::make('createReport')
-            ->modalHeading('')
-            ->color(fn () => Color::Pink)
-            ->icon('heroicon-o-presentation-chart-bar')
-            ->modalContent(function () {
-                return view('livewire.staff.report', [
-                    'date' => $this->date,
-                ]);
-            })
-            ->modalSubmitActionLabel('Send report to Milan')
-            ->iconSize('w-10 h-10')
-            ->action(fn () => dispatch_sync(new DailyReport));
+        $fixedFiles = [];
+
+        if (confirm('Would you like to run Laravel Pint?', true)) {
+            spin(
+                function () use (&$fixedFiles) {
+                    $pintOutput = shell_exec('./vendor/bin/pint');
+                    $this->info($pintOutput);
+
+                    // Collect the list of fixed files from the output
+                    preg_match_all('/^\s+✓ (\S+)/m', $pintOutput, $matches);
+                    if (isset($matches[1])) {
+                        $fixedFiles = $matches[1];
+                    }
+
+                    // Check if there were errors
+                    if (str_contains($pintOutput, 'FAIL') || str_contains($pintOutput, 'ERROR')) {
+                        $this->error('Laravel Pint found errors. Please fix them before proceeding.');
+                        exit(1); // Abort if there were errors
+                    }
+                },
+                'Running Laravel Pint...'
+            );
+
+            // Ensure we stage any fixed files right after Pint runs
+            foreach ($fixedFiles as $file) {
+                shell_exec("git add $file");
+                $this->info("Staged fixed file: $file");
+            }
+        } else {
+            $this->info('Skipping Laravel Pint.');
+        }
+
+        return $fixedFiles;
     }
 
-    public function mount(): void
+    protected function runTests(): void
     {
-        $this->date = Carbon::now()->startOfDay();
+        if (confirm('Would you like to run Pest Tests? If you need more detailed tests, please run it manually with flags you need.', true)) {
+            spin(
+                function () {
+                    $testOutput = shell_exec('./vendor/bin/pest');
+                    $this->info($testOutput);
+
+                    // Check if there were errors
+                    if (str_contains($testOutput, 'Fail') || str_contains($testOutput, 'Error')) {
+                        $this->error('Your Pest tests failed. Please fix them before proceeding.');
+                        exit(1); // Abort if there were errors
+                    }
+                },
+                'Running Pest Tests...'
+            );
+        } else {
+            $this->info('Skipping Pest Tests.');
+        }
+    }
+
+    protected function stageFixedFiles(array $fixedFiles): bool
+    {
+        // Stage the fixed files
+        foreach ($fixedFiles as $file) {
+            shell_exec("git add $file");
+            $this->info("Staged fixed file: $file");
+        }
+
+        // Check if there are any staged files
+        $stagedFiles = shell_exec('git diff --cached --name-only');
+        if (empty(trim($stagedFiles))) {
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function commitChanges(): void
+    {
+        $commitMessage = text('Enter the commit message');
+        if (! $commitMessage) {
+            $this->error('Commit message cannot be empty.');
+            exit(1); // Abort if commit message is empty
+        }
+
+        // Commit the staged files
+        shell_exec("git commit -m \"$commitMessage\"");
+        $this->info('Changes committed.');
+
+        // Get the current branch name
+        $process = new Process(['git', 'rev-parse', '--abbrev-ref', 'HEAD']);
+        $process->run();
+        $currentBranch = trim($process->getOutput());
+
+        // Prefill branch name and add options
+        $branch = $this->ask('Pushing code to', $currentBranch);
+        while (! $branch) {
+            $this->error('Branch name cannot be empty.');
+            $branch = $this->ask('Pushing code to', $currentBranch);
+        }
+
+        // Push the changes
+        $process = new Process(['git', 'push', 'origin', $branch]);
+        $process->run();
+        $this->info($process->getOutput());
+        if ($process->isSuccessful()) {
+            $this->info('Code pushed successfully.');
+        } else {
+            $this->error('Failed to push code.');
+        }
+
+        // Get the commit hash
+        $commitHash = shell_exec('git log -1 --format="%H"');
+        $commitHash = trim($commitHash);
+
+        // Get the Git username who pushed
+        $gitUserName = shell_exec('git config user.name');
+        $gitUserName = trim($gitUserName);
+
+        $this->info("Commit hash: $commitHash");
+        $this->info("Pushed by: $gitUserName");
     }
 }

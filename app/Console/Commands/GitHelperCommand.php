@@ -125,7 +125,7 @@ class GitHelperCommand extends Command
         shell_exec("git commit -m \"$commitMessage\"");
         $this->info('Changes committed.');
 
-        $currentBranch = trim((new Process(['git', 'rev-parse', '--abbrev-ref', 'HEAD']))->run()->getOutput());
+        $currentBranch = $this->getCurrentBranch();
         $branch = $this->ask('Pushing code to', $currentBranch);
 
         while (! $branch) {
@@ -133,6 +133,24 @@ class GitHelperCommand extends Command
             $branch = $this->ask('Pushing code to', $currentBranch);
         }
 
+        $this->pushToBranch($branch);
+
+        $commitHash = trim(shell_exec('git log -1 --format="%H"'));
+        $gitUserName = trim(shell_exec('git config user.name'));
+        $this->info("Commit hash: $commitHash");
+        $this->info("Pushed by: $gitUserName");
+    }
+
+    private function getCurrentBranch(): string
+    {
+        $process = new Process(['git', 'rev-parse', '--abbrev-ref', 'HEAD']);
+        $process->run();
+
+        return trim($process->getOutput());
+    }
+
+    private function pushToBranch(string $branch): void
+    {
         $process = new Process(['git', 'push', 'origin', $branch]);
         $process->run();
 
@@ -140,11 +158,7 @@ class GitHelperCommand extends Command
             $this->info('Code pushed successfully.');
         } else {
             $this->error('Failed to push code.');
+            $this->info($process->getErrorOutput());
         }
-
-        $commitHash = trim(shell_exec('git log -1 --format="%H"'));
-        $gitUserName = trim(shell_exec('git config user.name'));
-        $this->info("Commit hash: $commitHash");
-        $this->info("Pushed by: $gitUserName");
     }
 }

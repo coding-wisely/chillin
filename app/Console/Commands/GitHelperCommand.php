@@ -120,7 +120,7 @@ class GitHelperCommand extends Command
         $outputFiles = [];
         if (confirm("Would you like to run $toolName?", true)) {
             spin(
-                function () use ($command, &$outputFiles, $regexPattern, $errorKeyword1, $errorKeyword2) {
+                function () use ($command, &$outputFiles, $regexPattern, $errorKeyword1, $errorKeyword2, $toolName) {
                     $output = shell_exec($command);
                     $this->info($output);
 

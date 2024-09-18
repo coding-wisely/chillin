@@ -133,7 +133,10 @@ class GitHelperCommand extends Command
             $branch = $this->ask('Pushing code to', $currentBranch);
         }
 
-        $this->pushToBranch($branch);
+        $this->info("Pushing code to branch $branch...");
+
+        // Spin while pushing the code
+        spin(fn () => $this->pushToBranch($branch), "Pushing code to $branch...");
 
         $commitHash = trim(shell_exec('git log -1 --format="%H"'));
         $gitUserName = trim(shell_exec('git config user.name'));

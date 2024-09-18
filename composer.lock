@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "661c6afbfd3d66e62b37c75a46e1a3c1",
+    "content-hash": "e2e02f326c4c9f968cfa29deeacc76e5",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -425,6 +425,108 @@
                 }
             ],
             "time": "2024-02-09T16:56:22+00:00"
+        },
+        {
+            "name": "coding-wisely/commitvel",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "/Users/codingwisely/Code/Packages/commitvel",
+                "reference": "b5ce0afe14e0936e1648e51325726dbe114bc73d"
+            },
+            "require": {
+                "illuminate/contracts": "^10.0||^11.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.14",
+                "nunomaduro/collision": "^8.1.1||^7.10.0",
+                "orchestra/testbench": "^9.0.0||^8.22.0",
+                "pestphp/pest": "^2.34",
+                "pestphp/pest-plugin-arch": "^2.7",
+                "pestphp/pest-plugin-laravel": "^2.3"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "CodingWisely\\Commitvel\\CommitvelServiceProvider"
+                    ],
+                    "aliases": {
+                        "Commitvel": "CodingWisely\\Commitvel\\Facades\\Commitvel"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "CodingWisely\\Commitvel\\": "src/",
+                    "CodingWisely\\Commitvel\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "CodingWisely\\Commitvel\\Tests\\": "tests/",
+                    "Workbench\\App\\": "workbench/app/"
+                }
+            },
+            "scripts": {
+                "post-autoload-dump": [
+                    "@composer run prepare"
+                ],
+                "clear": [
+                    "@php vendor/bin/testbench package:purge-commitvel --ansi"
+                ],
+                "prepare": [
+                    "@php vendor/bin/testbench package:discover --ansi"
+                ],
+                "build": [
+                    "@composer run prepare",
+                    "@php vendor/bin/testbench workbench:build --ansi"
+                ],
+                "start": [
+                    "Composer\\Config::disableProcessTimeout",
+                    "@composer run build",
+                    "@php vendor/bin/testbench serve"
+                ],
+                "analyse": [
+                    "vendor/bin/phpstan analyse"
+                ],
+                "test": [
+                    "vendor/bin/pest"
+                ],
+                "test-coverage": [
+                    "vendor/bin/pest --coverage"
+                ],
+                "format": [
+                    "vendor/bin/pint"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Coding Wisely",
+                    "email": "vladimir@codingwisely.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A Laravel package to assist with Git operations and code quality checks.",
+            "homepage": "https://github.com/coding-wisely/commitvel",
+            "keywords": [
+                "coding-wisely",
+                "commitvel",
+                "git hooks",
+                "laravel",
+                "laravel pint",
+                "phppest",
+                "pre-commit",
+                "pre-commit hook"
+            ],
+            "transport-options": {
+                "relative": false
+            }
         },
         {
             "name": "danharrin/date-format-converter",
@@ -10891,7 +10993,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "coding-wisely/commitvel": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

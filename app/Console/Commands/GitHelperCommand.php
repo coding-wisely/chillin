@@ -156,10 +156,31 @@ class GitHelperCommand extends Command
 
         if ($process->isSuccessful()) {
             $this->info('Code pushed successfully.');
+            // Get the list of committed files
+            $committedFiles = $this->getCommittedFiles();
+
+            if (! empty($committedFiles)) {
+                $this->info('Files pushed:');
+                foreach ($committedFiles as $file) {
+                    $this->info(" - $file");
+                }
+            } else {
+                $this->info('No files were committed.');
+            }
         } else {
             $this->error('Failed to push code.');
             $this->error($process->getErrorOutput());
         }
+    }
+
+    protected function getCommittedFiles(): array
+    {
+        // Get the last commit hash
+        $lastCommitHash = trim(shell_exec('git log -1 --format="%H"'));
+        // Get the files in the last commit
+        $output = shell_exec("git diff-tree --no-commit-id --name-only -r $lastCommitHash");
+
+        return array_filter(explode("\n", trim($output)));
     }
 
     protected function getGitChanges(): array

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4ef3a897982fe1f0aa1d4812b3b60e25",
+    "content-hash": "e2e02f326c4c9f968cfa29deeacc76e5",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -428,17 +428,11 @@
         },
         {
             "name": "coding-wisely/commitvel",
-            "version": "1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/coding-wisely/commitvel.git",
-                "reference": "5a406a81ddf174d627fb9339b715aa2f49c8b934"
-            },
+            "version": "dev-main",
             "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/coding-wisely/commitvel/zipball/5a406a81ddf174d627fb9339b715aa2f49c8b934",
-                "reference": "5a406a81ddf174d627fb9339b715aa2f49c8b934",
-                "shasum": ""
+                "type": "path",
+                "url": "/Users/codingwisely/Code/Packages/commitvel",
+                "reference": "4837f7cde04bb6c101966b5f809a04f506281c5d"
             },
             "require": {
                 "illuminate/contracts": "^10.0||^11.0",
@@ -470,7 +464,44 @@
                     "CodingWisely\\Commitvel\\Database\\Factories\\": "database/factories/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "CodingWisely\\Commitvel\\Tests\\": "tests/",
+                    "Workbench\\App\\": "workbench/app/"
+                }
+            },
+            "scripts": {
+                "post-autoload-dump": [
+                    "@composer run prepare"
+                ],
+                "clear": [
+                    "@php vendor/bin/testbench package:purge-commitvel --ansi"
+                ],
+                "prepare": [
+                    "@php vendor/bin/testbench package:discover --ansi"
+                ],
+                "build": [
+                    "@composer run prepare",
+                    "@php vendor/bin/testbench workbench:build --ansi"
+                ],
+                "start": [
+                    "Composer\\Config::disableProcessTimeout",
+                    "@composer run build",
+                    "@php vendor/bin/testbench serve"
+                ],
+                "analyse": [
+                    "vendor/bin/phpstan analyse"
+                ],
+                "test": [
+                    "vendor/bin/pest"
+                ],
+                "test-coverage": [
+                    "vendor/bin/pest --coverage"
+                ],
+                "format": [
+                    "vendor/bin/pint"
+                ]
+            },
             "license": [
                 "MIT"
             ],
@@ -493,17 +524,9 @@
                 "pre-commit",
                 "pre-commit hook"
             ],
-            "support": {
-                "issues": "https://github.com/coding-wisely/commitvel/issues",
-                "source": "https://github.com/coding-wisely/commitvel/tree/v1.0.0"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/coding-wisely",
-                    "type": "github"
-                }
-            ],
-            "time": "2024-09-18T18:13:54+00:00"
+            "transport-options": {
+                "relative": false
+            }
         },
         {
             "name": "danharrin/date-format-converter",
@@ -10970,7 +10993,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "coding-wisely/commitvel": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

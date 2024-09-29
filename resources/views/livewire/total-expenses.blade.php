@@ -6,6 +6,6 @@
         <div>
             {{ $totalExpense }}
         </div>
-        <x-trend :trend="$trend" :percentageDifference="$percentageDifference"/>
+{{--        <x-trend :trend="$trend" :percentageDifference="$percentageDifference"/>--}}
     </div>
 </div>

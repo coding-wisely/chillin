@@ -2,7 +2,6 @@
     <div class="flex w-full flex-col px-4 sm:px-6 lg:px-8 space-y-10">
         <div class="p-2">
             <div class="grid sm:grid-cols-3 gap-5">
-
                 <!-- Summary Section -->
                 <div class="flex flex-col gap-3 col-span-2">
                     <livewire:total-incomes :date="$date" key="{{ $date }}"/>

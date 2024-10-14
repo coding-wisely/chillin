@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('ladydrinks', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class)->constrained()->onDelete('set null');
+            $table->foreignIdFor(User::class)->nullable()->constrained()->onDelete('set null');
             $table->integer('amount');
             $table->timestamps();
         });

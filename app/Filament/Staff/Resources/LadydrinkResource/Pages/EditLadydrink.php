@@ -10,6 +10,10 @@ class EditLadydrink extends EditRecord
 {
     protected static string $resource = LadydrinkResource::class;
 
+    public function getTitle(): string
+    {
+        return __('custom.Edit Ladydrink');
+    }
     protected function getHeaderActions(): array
     {
         return [

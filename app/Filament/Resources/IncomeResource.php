@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 
 class IncomeResource extends Resource
@@ -20,6 +21,15 @@ class IncomeResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
 
+    public static function getNavigationLabel(): string
+    {
+        return __('custom.Income');
+    }
+
+    public function getTitle(): string | Htmlable
+    {
+        return __('custom.Income');
+    }
     public static function form(Form $form): Form
     {
         return $form

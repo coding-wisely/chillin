@@ -55,6 +55,8 @@ class AppPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
+
+            ->viteTheme('resources/css/filament/staff/theme.css')
             ->authMiddleware([
                 Authenticate::class,
             ]);

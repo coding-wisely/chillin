@@ -54,7 +54,8 @@ class ListIncomes extends Component implements HasForms, HasTable
                     ->summarize(Sum::make()->money('THB')->label('Total:')),
 
             ])
-            ->heading('Incomes for '.Carbon::parse($this->date)->format('d M Y'))
+            ->emptyStateHeading(__('custom.No incomes found'))
+            ->heading(__('custom.Incomes for :date', ['date' => Carbon::parse($this->date)->format('d M Y')]))
             ->paginated(false)
             ->filters([
                 //

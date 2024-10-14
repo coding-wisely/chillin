@@ -55,7 +55,8 @@ class ListLadyDrinks extends Component implements HasForms, HasTable
                     ->summarize(Sum::make()->money('THB')->label('Total:')),
 
             ])
-            ->heading('Lady Drinks for '.Carbon::parse($this->date)->format('d M Y'))
+            ->emptyStateHeading(__('custom.No lady drinks found'))
+            ->heading(__('custom.Lady drinks for :date', ['date' => Carbon::parse($this->date)->format('d M Y')]))
             ->paginated(false)
             ->filters([
                 //

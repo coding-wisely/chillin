@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 
 class LadydrinkResource extends Resource
 {
@@ -16,15 +17,28 @@ class LadydrinkResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-sparkles';
 
+
+    public static function getNavigationLabel(): string
+    {
+        return __('custom.Lady drinks');
+    }
+
+    public function getTitle(): string | Htmlable
+    {
+        return __('custom.Lady drinks');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('amount')
+                    ->label(__('custom.Amount'))
                     ->required()
                     ->numeric(),
                 Forms\Components\Select::make('user_id')
-                    ->label('Staff')
+                    ->label(__('custom.Staff'))
+                    ->helperText(__('custom.Select the staff who sold the ladydrink.'))
                     ->relationship('user', 'name')
                     ->required(),
 

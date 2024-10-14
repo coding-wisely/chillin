@@ -11,6 +11,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 
 class IncomeResource extends Resource
 {
@@ -18,30 +19,42 @@ class IncomeResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
 
+    public static function getNavigationLabel(): string
+    {
+        return __('custom.Income');
+    }
+
+    public function getTitle(): string | Htmlable
+    {
+        return __('custom.Income');
+    }
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Section::make()->schema([
                     Forms\Components\Select::make('category_id')
-                        ->label('Select Income Category')
+                        ->label(__('custom.Select Income'))
                         ->relationship('category', 'title')
-                        ->helperText('Select the category for this record.')
+                        ->helperText(__('custom.Select the category for this record.'))
                         ->required(),
                     Forms\Components\TextInput::make('amount')
-                        ->helperText('The amount of the income in thai baht. e.g 100')
+                        ->label(__('custom.Amount'))
+                        ->helperText(__('custom.The amount of the income in thai baht. e.g 100'))
                         ->numeric()
                         ->required(),
                 ])->columnSpan(2),
-                Section::make('Details')
-                    ->description('Add more details about the expense.')
+                Section::make(__('custom.Details'))
+                    ->label(__('custom.Details'))
+                    ->description(__('custom.Add more details about the income.'))
                     ->disabled()
                     ->schema([
                         Forms\Components\Select::make('user_id')
                             ->relationship('user', 'name')
-                            ->label('Staff')
+                            ->label(__('custom.Staff'))
                             ->default(auth()->id()),
-                        Forms\Components\DateTimePicker::make('spent_at')
+                        Forms\Components\DateTimePicker::make('received_at')
+                            ->label(__('custom.Received at'))
                             ->native(false)
                             ->default(now()),
                     ])->columnSpan(1),
@@ -54,13 +67,19 @@ class IncomeResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('category.title')
+                    ->label(__('custom.Income'))
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
-
+                    ->label(__('custom.Staff'))
                     ->sortable(),
-                Tables\Columns\TextColumn::make('amount')->money('THB')->summarize(Sum::make()->money('THB')->label('Total:')),
+                Tables\Columns\TextColumn::make('amount')
+                    ->label(__('custom.Amount'))
+                    ->money('THB')
+                    ->summarize(Sum::make()->money('THB')
+                        ->label(__('custom.Total') . ':')),
                 Tables\Columns\TextColumn::make('received_at')
+                    ->label(__('custom.Received at'))
                     ->sortable(),
             ])
             ->filters([

@@ -10,6 +10,11 @@ class EditUserDayOff extends EditRecord
 {
     protected static string $resource = UserDayOffResource::class;
 
+    public function getTitle(): string
+    {
+        return __('custom.Edit Day off');
+    }
+
     protected function getHeaderActions(): array
     {
         return [

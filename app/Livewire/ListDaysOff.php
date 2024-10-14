@@ -45,7 +45,8 @@ class ListDaysOff extends Component implements HasForms, HasTable
                 TextColumn::make('user.name')
                     ->label('Staff'),
             ])
-            ->heading('Staff on day off for '.Carbon::parse($this->date)->format('d M Y'))
+            ->emptyStateHeading(__('custom.No user is on the day off'))
+            ->heading(__('custom.Staff on the day off for :date', ['date' => Carbon::parse($this->date)->format('d M Y')]))
             ->paginated(false)
             ->filters([
                 //

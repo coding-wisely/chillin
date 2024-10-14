@@ -16,7 +16,7 @@ class CreateIncome extends CreateRecord
 
     protected function getCreatedNotificationTitle(): ?string
     {
-        return 'Income created!';
+        return __('custom.Income created!');
     }
 
     protected function mutateFormDataBeforeCreate(array $data): array

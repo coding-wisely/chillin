@@ -7,7 +7,6 @@ use App\Models\Income;
 use Carbon\Carbon;
 use Illuminate\Support\Number;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -61,7 +60,7 @@ class DailyReport extends Mailable
                 'totalExpenses' => Number::currency($totalExpenses, 'THB'),
                 'saldo' => $saldo,
                 'image_url' => asset('images/emails/logo.jpg'),
-                'url' => url('/'),
+                'url' => url('/reports/?date=' . Carbon::parse($this->date)->unix()),
 
             ]
         );

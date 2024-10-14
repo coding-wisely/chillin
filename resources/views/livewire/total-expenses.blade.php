@@ -1,6 +1,6 @@
 <div class="grid grid-cols-3 border-b-4 gap-4">
     <div class="uppercase text-green-800 col-span-1">
-        Expense
+        {{ __('custom.Expense') }}
     </div>
     <div class="flex justify-between col-span-2">
         <div>

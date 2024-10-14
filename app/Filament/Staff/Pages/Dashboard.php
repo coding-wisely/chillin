@@ -14,6 +14,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
 use Filament\Support\Colors\Color;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Mail;
 
 class Dashboard extends BaseDashboard implements HasActions, HasForms
@@ -28,28 +29,51 @@ class Dashboard extends BaseDashboard implements HasActions, HasForms
 
     public string $date = '';
 
+    public static function getNavigationLabel(): string
+    {
+        return __('custom.Dashboard');
+    }
+
+    public function getTitle(): string | Htmlable
+    {
+        return __('custom.Dashboard');
+    }
+
     public function createLadyDrink()
     {
         return Action::make('LADY DRINKS')
+            ->label(__('custom.Lady drinks'))
             ->url(fn(): string => url('/staff/ladydrinks/create'))
-            ->icon('heroicon-o-plus-circle')
+            ->icon('heroicon-o-sparkles')
+            ->iconSize('w-10 h-10');
+    }
+    public function createDayOff()
+    {
+        return Action::make('Day off')
+            ->label(__('custom.Day off'))
+            ->color(fn() => Color::Zinc)
+            ->url(fn(): string => url('/staff/user-day-offs/create'))
+            ->icon('heroicon-o-rocket-launch')
             ->iconSize('w-10 h-10');
     }
 
     public function createExpense()
     {
         return Action::make('EXPENSE')
+            ->label(__('custom.Expense'))
+            ->color(fn() => Color::Amber)
             ->url(fn(): string => url('/staff/expenses/create'))
-            ->icon('heroicon-o-plus-circle')
+            ->icon('heroicon-o-rectangle-stack')
             ->iconSize('w-10 h-10');
     }
 
     public function createIncome()
     {
         return Action::make('INCOME')
+            ->label(__('custom.Income'))
             ->color(fn() => Color::Sky)
             ->url(fn(): string => url('/staff/incomes/create'))
-            ->icon('heroicon-o-plus-circle')
+            ->icon('heroicon-o-banknotes')
             ->iconSize('w-10 h-10');
 
     }
@@ -57,6 +81,7 @@ class Dashboard extends BaseDashboard implements HasActions, HasForms
     public function createReport()
     {
         return Action::make('createReport')
+            ->label(__('custom.Create Report For Milan'))
             ->modalHeading('')
             ->color(fn() => Color::Pink)
             ->icon('heroicon-o-presentation-chart-bar')
@@ -65,23 +90,12 @@ class Dashboard extends BaseDashboard implements HasActions, HasForms
                     'date' => $this->date,
                 ]);
             })
-            ->modalSubmitActionLabel('Send report to Milan')
+            ->modalSubmitActionLabel(__('custom.Send report to Milan'))
             ->iconSize('w-10 h-10')
             ->action(fn() => defer(function () {
-
-                $totalIncome = Income::where('date', $this->date)->sum('amount');
-                $totalExpense = Expense::where('date', $this->date)->sum('amount');
-                $totalProfit = $totalIncome - $totalExpense;
-
-                $reportData = [
-                    'date' => $this->date,
-                    'totalIncome' => $totalIncome,
-                    'totalExpense' => $totalExpense,
-                    'totalProfit' => $totalProfit,
-                ];
                 $date = $this->date;
                 // Call a function to send the report to Milan
-                return $this->sendReportToMilan($date);
+                $this->sendReportToMilan($date);
             }));
     }
 

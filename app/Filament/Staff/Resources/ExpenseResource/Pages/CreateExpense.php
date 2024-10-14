@@ -16,7 +16,7 @@ class CreateExpense extends CreateRecord
 
     protected function getCreatedNotificationTitle(): ?string
     {
-        return 'Expense created!';
+        return __('custom.Expense created!');
     }
 
     protected function mutateFormDataBeforeCreate(array $data): array

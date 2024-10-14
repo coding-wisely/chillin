@@ -53,11 +53,12 @@ class ListExpenses extends Component implements HasForms, HasTable
                     ->summarize(Sum::make()->money('THB')->label('Total:')),
 
             ])
-            ->heading('Expenses for '.Carbon::parse($this->date)->format('d M Y'))
+            ->heading(__('custom.Expenses for :date', ['date' => Carbon::parse($this->date)->format('d M Y')]))
             ->paginated(false)
             ->filters([
                 //
             ])
+            ->emptyStateHeading(__('custom.No expenses found'))
             ->actions([
                 //
             ])

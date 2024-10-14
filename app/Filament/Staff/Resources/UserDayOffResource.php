@@ -9,21 +9,34 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 
 class UserDayOffResource extends Resource
 {
     protected static ?string $model = UserDayOff::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-rocket-launch';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('custom.Day off');
+    }
+
+    public function getTitle(): string|Htmlable
+    {
+        return __('custom.Day off');
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Select::make('user_id')
+                    ->label(__('custom.Staff'))
                     ->relationship('user', 'name')
                     ->required(),
                 Forms\Components\DatePicker::make('day_off_date')
+                    ->label(__('custom.Day off date'))
                     ->required(),
             ]);
     }
@@ -33,9 +46,11 @@ class UserDayOffResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
+                    ->label(__('custom.Staff'))
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('day_off_date')
+                    ->label(__('custom.Day off date'))
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -51,7 +66,8 @@ class UserDayOffResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                ->label(__('custom.Edit Day off')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

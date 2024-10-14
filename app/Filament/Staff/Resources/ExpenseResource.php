@@ -11,6 +11,8 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
+use const _PHPStan_cb8f9103f\__;
 
 class ExpenseResource extends Resource
 {
@@ -18,29 +20,40 @@ class ExpenseResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public static function getNavigationLabel(): string
+    {
+        return __('custom.Expense');
+    }
+
+    public function getTitle(): string | Htmlable
+    {
+        return __('custom.Expense');
+    }
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Section::make()->schema([
                     Forms\Components\Select::make('category_id')
-                        ->label('Select Expense')
+                        ->label(__('custom.Select Expense'))
                         ->relationship('category', 'title')
-                        ->helperText('Select the expense.')
+                        ->helperText(__('custom.Select the expense category.'))
                         ->required(),
                     Forms\Components\TextInput::make('amount')
-                        ->helperText('The amount of the expense in thai baht.')
+                        ->label(__('custom.Amount'))
+                        ->helperText(__('custom.The amount of the expense in thai baht.'))
                         ->required()
                         ->numeric(),
                 ])->columnSpan(2),
-                Section::make('Details')
-                    ->description('Add more details about the expense.')
+                Section::make(__('custom.Details'))
+                    ->description(__('custom.Add more details about the expense.'))
                     ->schema([
                         Forms\Components\Select::make('user_id')
                             ->relationship('user', 'name')
-                            ->label('Staff')
+                            ->label(__('custom.Staff'))
                             ->default(auth()->id())->disabled(),
                         Forms\Components\DateTimePicker::make('spent_at')
+                            ->label(__('custom.Spent at'))
                             ->native(false)
                             ->default(now()),
                     ])->columnSpan(1),
@@ -53,12 +66,20 @@ class ExpenseResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('category.title')
+                    ->label(__('custom.Category'))
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
+                    ->label(__('custom.Staff'))
                     ->sortable(),
-                Tables\Columns\TextColumn::make('amount')->money('THB')->summarize(Sum::make()->money('THB')->label('Total:')),
+                Tables\Columns\TextColumn::make('amount')
+                    ->label(__('custom.Amount'))
+                    ->money('THB')
+                    ->summarize(Sum::make()
+                        ->money('THB')
+                    ->label(__('custom.Total') . ':'))->numeric()->sortable(),
                 Tables\Columns\TextColumn::make('spent_at')
+                    ->label(__('custom.Spent at'))
                     ->sortable(),
             ])
             ->filters([

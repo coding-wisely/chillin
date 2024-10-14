@@ -95,7 +95,9 @@ class Dashboard extends BaseDashboard implements HasActions, HasForms
             ->action(fn() => defer(function () {
                 $date = $this->date;
                 // Call a function to send the report to Milan
-                $this->sendReportToMilan($date);
+                $milan = config('app.admin_mail');
+                Mail::to($milan)
+                    ->send(new DailyReport($date));
             }));
     }
 

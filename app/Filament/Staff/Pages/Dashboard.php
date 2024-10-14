@@ -92,14 +92,11 @@ class Dashboard extends BaseDashboard implements HasActions, HasForms
             })
             ->modalSubmitActionLabel(__('custom.Send report to Milan'))
             ->iconSize('w-10 h-10')
-            ->action(fn() => defer(function () {
+            ->action(function () {
                 $date = $this->date;
                 // Call a function to send the report to Milan
-                $this->dispatch(function () use ($date) {
-                    Mail::to(config('app.admin_mail'))
-                        ->send(new DailyReport($date));
-                });
-            }));
+                $this->sendReportToMilan($date);
+            });
     }
 
     public function mount(): void
@@ -109,9 +106,6 @@ class Dashboard extends BaseDashboard implements HasActions, HasForms
 
     private function sendReportToMilan(string $date)
     {
-        $this->dispatch(function () use ($date) {
-            Mail::to(config('app.admin_mail'))
-                ->send(new DailyReport($date));
-        });
+        Mail::to(config('app.admin_mail'))->send(new DailyReport($date));
     }
 }

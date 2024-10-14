@@ -61,7 +61,6 @@ class DailyReport extends Mailable
                 'saldo' => $saldo,
                 'image_url' => asset('images/emails/logo.jpg'),
                 'url' => url('/reports/?date=' . Carbon::parse($this->date)->unix()),
-
             ]
         );
     }

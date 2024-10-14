@@ -106,6 +106,6 @@ class Dashboard extends BaseDashboard implements HasActions, HasForms
 
     private function sendReportToMilan(string $date)
     {
-        Mail::to('milan@chillinpattaya.com')->send(new DailyReport($date));
+        Mail::to(config('app.admin_mail'))->send(new DailyReport($date));
     }
 }

@@ -26,7 +26,7 @@ class ExpenseResource extends Resource
                     ->required(),
                 Forms\Components\Select::make('category_id')
                     ->relationship('category', 'title')
-                    ->when(fn () => auth()->user()->email === 'milan@chillinpattaya.com')
+                    ->when(fn () => auth()->user()->email === config('app.admin_mail'))
                     ->createOptionForm(
                         [Forms\Components\TextInput::make('title')->required()]
                     )

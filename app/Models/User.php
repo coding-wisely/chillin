@@ -67,12 +67,8 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     public function canAccessPanel(Panel $panel): bool
     {
         if ($panel->getId() === 'app') {
-            return $this->email === 'milan@chillinpattaya.com';
+            return $this->email === config('app.admin_mail');
         }
-        if ($panel->getId() === 'staff') {
-            return $this->email === 'vladimir@chillinpattaya.com';
-        }
-
         return false;
     }
 

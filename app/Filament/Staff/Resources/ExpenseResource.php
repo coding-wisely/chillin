@@ -12,13 +12,12 @@ use Filament\Tables;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
-use const _PHPStan_cb8f9103f\__;
 
 class ExpenseResource extends Resource
 {
     protected static ?string $model = Expense::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
 
     public static function getNavigationLabel(): string
     {
@@ -48,14 +47,15 @@ class ExpenseResource extends Resource
                 Section::make(__('custom.Details'))
                     ->description(__('custom.Add more details about the expense.'))
                     ->schema([
-                        Forms\Components\Select::make('user_id')
-                            ->relationship('user', 'name')
-                            ->label(__('custom.Staff'))
-                            ->default(auth()->id())->disabled(),
                         Forms\Components\DateTimePicker::make('spent_at')
                             ->label(__('custom.Spent at'))
                             ->native(false)
                             ->default(now()),
+                        Forms\Components\Select::make('user_id')
+                            ->relationship('user', 'name')
+                            ->label(__('custom.Staff'))
+                            ->default(auth()->id())
+                            ->disabled(),
                     ])->columnSpan(1),
 
             ])->columns(3);

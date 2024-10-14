@@ -22,8 +22,7 @@ class CategoryResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('title')
                     ->required(),
-                Forms\Components\Textarea::make('description')
-                    ->columnSpanFull(),
+                
             ]);
     }
 

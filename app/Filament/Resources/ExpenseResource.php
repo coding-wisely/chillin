@@ -6,11 +6,14 @@ use App\Filament\Resources\ExpenseResource\Pages;
 use App\Filament\Resources\ExpenseResource\Widgets\ExpenseStatsWidget;
 use App\Models\Expense;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 
 class ExpenseResource extends Resource
 {
@@ -18,62 +21,68 @@ class ExpenseResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
 
+    public static function getNavigationLabel(): string
+    {
+        return __('custom.Expense');
+    }
+
+    public function getTitle(): string | Htmlable
+    {
+        return __('custom.Expense');
+    }
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('title')
-                    ->required(),
-                Forms\Components\Select::make('category_id')
-                    ->relationship('category', 'title')
-                    ->when(fn () => auth()->user()->email === config('app.admin_mail'))
-                    ->createOptionForm(
-                        [Forms\Components\TextInput::make('title')->required()]
-                    )
-                    ->required(),
-                Forms\Components\Textarea::make('description')
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('amount')
-                    ->required()
-                    ->numeric(),
-            ]);
+                Section::make()->schema([
+                    Forms\Components\Select::make('category_id')
+                        ->label(__('custom.Select Expense'))
+                        ->relationship('category', 'title')
+                        ->helperText(__('custom.Select the expense category.'))
+                        ->required(),
+                    Forms\Components\TextInput::make('amount')
+                        ->label(__('custom.Amount'))
+                        ->helperText(__('custom.The amount of the expense in thai baht.'))
+                        ->required()
+                        ->numeric(),
+                ])->columnSpan(2),
+                Section::make(__('custom.Details'))
+                    ->description(__('custom.Add more details about the expense.'))
+                    ->schema([
+                        Forms\Components\Select::make('user_id')
+                            ->relationship('user', 'name')
+                            ->label(__('custom.Staff'))
+                            ->default(auth()->id()),
+                        Forms\Components\DateTimePicker::make('spent_at')
+                            ->label(__('custom.Spent at'))
+                            ->native(false)
+                            ->default(now()),
+                    ])->columnSpan(1),
+
+            ])->columns(3);
     }
 
     public static function table(Table $table): Table
     {
         return $table
-            ->groups([
-                Group::make('user.name')
-                    ->label('Staff name'),
-                Group::make('category.title')
-                    ->label('Category name'),
-                Group::make('created_at')
-                    ->label('Date')
-                    ->date()
-                    ->collapsible(true),
-            ])
-            ->defaultGroup(Group::make('created_at')
-                ->date())
             ->columns([
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
-                Tables\Columns\TextColumn::make('user.name')
+                Tables\Columns\TextColumn::make('category.title')
+                    ->label(__('custom.Category'))
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('title')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('category.title')
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label(__('custom.Staff'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('amount')
-                    ->money('THB', locale: 'th')
+                    ->label(__('custom.Amount'))
+                    ->money('THB')
+                    ->summarize(Sum::make()
+                        ->money('THB')
+                        ->label(__('custom.Total') . ':'))->numeric()->sortable(),
+                Tables\Columns\TextColumn::make('spent_at')
+                    ->label(__('custom.Spent at'))
                     ->sortable(),
-                Tables\Columns\TextColumn::make('description')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('created_at', 'desc')
             ->filters([
                 //
             ])

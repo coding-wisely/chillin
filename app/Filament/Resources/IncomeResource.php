@@ -6,6 +6,7 @@ use App\Filament\Resources\IncomeResource\Pages;
 use App\Models\Income;
 use Carbon\Carbon;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -34,84 +35,57 @@ class IncomeResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('category_id')
-                    ->relationship('category', 'title')
-                    ->required(),
-                Forms\Components\Select::make('user_id')
-                    ->relationship('user', 'name')
-                    ->required(),
-                Forms\Components\TextInput::make('title')
-                    ->required(),
-                Forms\Components\TextInput::make('description')
-                    ->required(),
-            ]);
+                Section::make()->schema([
+                    Forms\Components\Select::make('category_id')
+                        ->label(__('custom.Select Income'))
+                        ->relationship('category', 'title')
+                        ->helperText(__('custom.Select the category for this record.'))
+                        ->required(),
+                    Forms\Components\TextInput::make('amount')
+                        ->label(__('custom.Amount'))
+                        ->helperText(__('custom.The amount of the income in thai baht. e.g 100'))
+                        ->numeric()
+                        ->required(),
+                ])->columnSpan(2),
+                Section::make(__('custom.Details'))
+                    ->label(__('custom.Details'))
+                    ->description(__('custom.Add more details about the income.'))
+                    ->schema([
+                        Forms\Components\Select::make('user_id')
+                            ->relationship('user', 'name')
+                            ->label(__('custom.Staff'))
+                            ->default(auth()->id()),
+                        Forms\Components\DateTimePicker::make('received_at')
+                            ->label(__('custom.Received at'))
+                            ->native(false)
+                            ->default(now()),
+                    ])->columnSpan(1),
+
+            ])->columns(3);
     }
 
     public static function table(Table $table): Table
     {
         return $table
-            ->groups([
-                Group::make('user.name')
-                    ->label('Staff name'),
-                Group::make('category.title')
-                    ->label('Category name'),
-                Group::make('created_at')
-                    ->label('Date')
-                    ->date()
-                    ->collapsible(true),
-            ])
-            ->defaultGroup(Group::make('created_at')
-                ->date())
-
             ->columns([
                 Tables\Columns\TextColumn::make('category.title')
+                    ->label(__('custom.Income'))
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
-                    ->numeric()
+                    ->label(__('custom.Staff'))
                     ->sortable(),
-                Tables\Columns\TextColumn::make('title')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('amount')
-                    ->money('THB', locale: 'th')
-                    ->summarize(Sum::make()->money('THB', locale: 'th')
-                    )
+                    ->label(__('custom.Amount'))
+                    ->money('THB')
+                    ->summarize(Sum::make()->money('THB')
+                        ->label(__('custom.Total') . ':')),
+                Tables\Columns\TextColumn::make('received_at')
+                    ->label(__('custom.Received at'))
                     ->sortable(),
-                Tables\Columns\TextColumn::make('description')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->date()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])->defaultSort('created_at', 'desc')
+            ])
             ->filters([
-                Tables\Filters\Filter::make('created_at')
-                    ->form([
-                        Forms\Components\Fieldset::make('Income between dates')
-                            ->schema([
-                                Forms\Components\DatePicker::make('from')
-                                    ->native(false)
-                                    ->label('From')
-                                    ->required(),
-                                Forms\Components\DatePicker::make('to')
-                                    ->native(false)
-                                    ->label('To')
-                                    ->required(),
-                            ])->columns(2),
-                    ])
-                    ->query(function (Builder $query, array $data) {
-                        return $query->when($data['from'] ?? null, function ($query) use ($data) {
-                            $query->whereBetween('created_at', [
-                                Carbon::parse($data['from'])->startOfDay(),
-                                Carbon::parse($data['to'])->endOfDay(),
-                            ]);
-                        });
-                        $query->whereBetween('created_at', [
-                            Carbon::parse($data['from'])->startOfDay(),
-                            Carbon::parse($data['to'])->endOfDay(),
-                        ]);
-                    }),
+                //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -120,8 +94,7 @@ class IncomeResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ])
-            ->defaultSort('created_at', 'desc');
+            ]);
     }
 
     public static function getRelations(): array

@@ -47,16 +47,16 @@ class IncomeResource extends Resource
                 Section::make(__('custom.Details'))
                     ->label(__('custom.Details'))
                     ->description(__('custom.Add more details about the income.'))
-                    ->disabled()
                     ->schema([
-                        Forms\Components\Select::make('user_id')
-                            ->relationship('user', 'name')
-                            ->label(__('custom.Staff'))
-                            ->default(auth()->id()),
                         Forms\Components\DateTimePicker::make('received_at')
                             ->label(__('custom.Received at'))
                             ->native(false)
                             ->default(now()),
+                        Forms\Components\Select::make('user_id')
+                            ->relationship('user', 'name')
+                            ->label(__('custom.Staff'))
+                            ->default(auth()->id()),
+
                     ])->columnSpan(1),
 
             ])->columns(3);

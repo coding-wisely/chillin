@@ -69,6 +69,10 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         if ($panel->getId() === 'app') {
             return $this->email === config('app.admin_mail');
         }
+        if ($panel->getId() === 'staff') {
+            return true;
+        }
+
         return false;
     }
 

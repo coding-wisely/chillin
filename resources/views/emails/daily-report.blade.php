@@ -104,7 +104,7 @@
                   <p style="margin: 0; font-size: 16px; line-height: 24px; color: #475569">
                     Thanks,
                     <br>
-                    <span style="font-weight: 600">Vladimir</span>
+                    <span style="font-weight: 600">Chill In Web Team</span>
                   </p>
                   <div role="separator" style="height: 1px; line-height: 1px; background-color: #cbd5e1; margin-top: 24px; margin-bottom: 24px">&zwj;</div>
                   <p class="mso-break-all" style="margin: 0; font-size: 12px; line-height: 20px; color: #475569">
